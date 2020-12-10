@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>eHelper</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,400i&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="bubbles">
+
+</div>
+
+
+	<script type="text/javascript">var $bubbles = $('.bubbles');
+
+function bubbles() {
+  
+  // Settings
+  var min_bubble_count = 20, // Minimum number of bubbles
+      max_bubble_count = 60, // Maximum number of bubbles
+      min_bubble_size = 3, // Smallest possible bubble diameter (px)
+      max_bubble_size = 12; // Maximum bubble blur amount (px)
+  
+  // Calculate a random number of bubbles based on our min/max
+  var bubbleCount = min_bubble_count + Math.floor(Math.random() * (max_bubble_count + 1));
+  
+  // Create the bubbles
+  for (var i = 0; i < bubbleCount; i++) {
+    $bubbles.append('<div class="bubble-container"><div class="bubble"></div></div>');
+  }
+  
+  // Now randomise the various bubble elements
+  $bubbles.find('.bubble-container').each(function(){
+    
+    // Randomise the bubble positions (0 - 100%)
+    var pos_rand = Math.floor(Math.random() * 101);
+    
+    // Randomise their size
+    var size_rand = min_bubble_size + Math.floor(Math.random() * (max_bubble_size + 1));
+    
+    // Randomise the time they start rising (0-15s)
+    var delay_rand = Math.floor(Math.random() * 16);
+    
+    // Randomise their speed (3-8s)
+    var speed_rand = 3 + Math.floor(Math.random() * 9);
+    
+    // Random blur
+    var blur_rand = Math.floor(Math.random() * 3);
+    
+    // Cache the this selector
+    var $this = $(this);
+    
+    // Apply the new styles
+    $this.css({
+      'left' : pos_rand + '%',
+      
+      '-webkit-animation-duration' : speed_rand + 's',
+      '-moz-animation-duration' : speed_rand + 's',
+      '-ms-animation-duration' : speed_rand + 's',
+      'animation-duration' : speed_rand + 's',
+      
+      '-webkit-animation-delay' : delay_rand + 's',
+      '-moz-animation-delay' : delay_rand + 's',
+      '-ms-animation-delay' : delay_rand + 's',
+      'animation-delay' : delay_rand + 's',
+      
+      '-webkit-filter' : 'blur(' + blur_rand  + 'px)',
+      '-moz-filter' : 'blur(' + blur_rand  + 'px)',
+      '-ms-filter' : 'blur(' + blur_rand  + 'px)',
+      'filter' : 'blur(' + blur_rand  + 'px)',
+    });
+    
+    $this.children('.bubble').css({
+      'width' : size_rand + 'px',
+      'height' : size_rand + 'px'
+    });
+    
+  });
+}
+
+
+
+bubbles();
+class TextScramble {
+                constructor(el) {
+                    this.el = el
+                    this.chars = '!<>-_\\/[]{}—=+*^?#_&$@'
+                    this.update = this.update.bind(this)
+                }
+                setText(newText) {
+                    const oldText = this.el.innerText
+                    const length = Math.max(oldText.length, newText.length)
+                    const promise = new Promise((resolve)=>this.resolve = resolve)
+                    this.queue = []
+                    for (let i = 0; i < length; i++) {
+                        const from = oldText[i] || ''
+                        const to = newText[i] || ''
+                        const start = Math.floor(Math.random() * 40)
+                        const end = start + Math.floor(Math.random() * 40)
+                        this.queue.push({
+                            from,
+                            to,
+                            start,
+                            end
+                        })
+                    }
+                    cancelAnimationFrame(this.frameRequest)
+                    this.frame = 0
+                    this.update()
+                    return promise
+                }
+                update() {
+                    let output = ''
+                    let complete = 0
+                    for (let i = 0, n = this.queue.length; i < n; i++) {
+                        let {from, to, start, end, char} = this.queue[i]
+                        if (this.frame >= end) {
+                            complete++
+                            output += to
+                        } else if (this.frame >= start) {
+                            if (!char || Math.random() < 0.28) {
+                                char = this.randomChar()
+                                this.queue[i].char = char
+                            }
+                            output += `<span class="dud">${char}</span>`
+                        } else {
+                            output += from
+                        }
+                    }
+                    this.el.innerHTML = output
+                    if (complete === this.queue.length) {
+                        this.resolve()
+                    } else {
+                        this.frameRequest = requestAnimationFrame(this.update)
+                        this.frame++
+                    }
+                }
+                randomChar() {
+                    return this.chars[Math.floor(Math.random() * this.chars.length)]
+                }
+            }
+
+            const phrases = ['Tech Helper']
+
+            const el = document.querySelector('.left')
+            const fx = new TextScramble(el)
+
+            let counter = 0
+            const next = ()=>{
+                fx.setText(phrases[counter]).then(()=>{
+                    setTimeout(next, 800)
+                }
+                )
+                counter = (counter + 1) % phrases.length
+            }
+
+
+</script>
+
+</body>
+</html>
